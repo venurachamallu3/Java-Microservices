@@ -12,6 +12,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 public class EmployeeServiceImpl implements EmployeeService {
 
@@ -22,7 +25,8 @@ public class EmployeeServiceImpl implements EmployeeService {
     private EmployeeRepository employeeRepository;
 
     @Autowired
-    private RestTemplate restTemplate;
+    private AppClient appClient;
+//    private RestTemplate restTemplate;
     public EmployeeDTO saveEmployee(EmployeeDTO employeeDTO) {
         Employee employee = modelMapper.map(employeeDTO,Employee.class);
         Employee e = employeeRepository.save(employee);
@@ -36,16 +40,25 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     }
 
+    public List<Employee> fetchAllEmployees(){
+        List<Employee> emp = employeeRepository.findAll();
+        return  emp;
+//        emp.stream().map(modelMapper.map(emp,EmployeeDTO.class)).collect(Collectors.toSet());
+    }
+
     public EmpDep getEmployeeDept(Long id )
     {
         EmployeeDTO employee = modelMapper.map(employeeRepository.findById(id).get(),EmployeeDTO.class);
         System.out.println("employee"+employee.getDepartmentCode());
-        ResponseEntity<DepartmentDTO> department = restTemplate.getForEntity("http://localhost:8080/api/department/show/"+employee.getDepartmentCode() , DepartmentDTO.class);
+//        ResponseEntity<DepartmentDTO> department = restTemplate.getForEntity("http://localhost:8080/api/department/show/"+employee.getDepartmentCode() , DepartmentDTO.class);
 
-        DepartmentDTO dep = department.getBody();
+
+        DepartmentDTO dep =  appClient.getDepartmentByCode(employee.getDepartmentCode());
+
+//        DepartmentDTO dep = department.getBody();
 
         EmpDep employeeDep = new EmpDep();
-        employeeDep.setDepId(employee.getId());
+        employeeDep.setEmpId(employee.getId());
         employeeDep.setEname(employee.getName());
         employeeDep.setEaddress(employee.getAddress());
         employeeDep.setEemail(employee.getEmail());
