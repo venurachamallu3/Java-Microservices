@@ -4,6 +4,7 @@ import com.example.Employee.Service.DTO.DepartmentDTO;
 import com.example.Employee.Service.DTO.EmpDep;
 import com.example.Employee.Service.DTO.EmployeeDTO;
 import com.example.Employee.Service.Entity.Employee;
+import com.example.Employee.Service.Exception.IDNotFoundException;
 import com.example.Employee.Service.Repository.EmployeeRepository;
 import com.example.Employee.Service.Service.EmployeeService;
 import org.modelmapper.ModelMapper;
@@ -35,7 +36,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     public EmployeeDTO fetchByID(Long id){
-        Employee employee = employeeRepository.findById(id).get();
+        Employee employee = employeeRepository.findById(id).orElseThrow(()-> new IDNotFoundException("Employee is not found with this ID "+id));
         return  modelMapper.map(employee,EmployeeDTO.class);
 
     }
@@ -48,7 +49,8 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     public EmpDep getEmployeeDept(Long id )
     {
-        EmployeeDTO employee = modelMapper.map(employeeRepository.findById(id).get(),EmployeeDTO.class);
+        Employee e = employeeRepository.findById(id).orElseThrow(()->new IDNotFoundException("Employee is not found with the ID is "+id));
+        EmployeeDTO employee = modelMapper.map(e,EmployeeDTO.class);
         System.out.println("employee"+employee.getDepartmentCode());
 //        ResponseEntity<DepartmentDTO> department = restTemplate.getForEntity("http://localhost:8080/api/department/show/"+employee.getDepartmentCode() , DepartmentDTO.class);
 
@@ -69,5 +71,23 @@ public class EmployeeServiceImpl implements EmployeeService {
 
 
         return employeeDep;
+    }
+
+
+    public String deleteEmployeeByID(Long Id){
+        employeeRepository.deleteById(Id);
+        return "Successfully Deleted......";
+    }
+
+    public EmployeeDTO updateEmployee(Long id, Employee employee) {
+        Employee em = employeeRepository.findById(id).get();
+        if(em!=null){
+            em.setName(employee.getName());
+            em.setAddress(employee.getAddress());
+            em.setEmail(employee.getEmail());
+            em.setDepartmentCode(employee.getDepartmentCode());
+        employeeRepository.save(em);
+        }
+        return modelMapper.map(em,EmployeeDTO.class);
     }
 }
