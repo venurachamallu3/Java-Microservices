@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
 
-@FeignClient(name="DEPARTMENT-SERVICE")
+@FeignClient(name="DEPARTMENT-SERVICE" , url = "http://localhost:8080")
 public interface AppClient {
     @GetMapping("api/department/show/{code}")
     DepartmentDTO getDepartmentByCode(@PathVariable("code") String code);

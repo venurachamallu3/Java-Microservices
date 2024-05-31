@@ -25,7 +25,7 @@ public class DepartmentController {
     public ResponseEntity<DepartmentDTO> createDepartment(@RequestBody DepartmentDTO departmentDTO){
         return new ResponseEntity<>(departmentService.createDepartment(departmentDTO), HttpStatus.CREATED);
     }
-    
+
 
     @GetMapping("show/{code}")
     public  ResponseEntity<DepartmentDTO> getDepartmentByCode(@PathVariable("code") String code){
